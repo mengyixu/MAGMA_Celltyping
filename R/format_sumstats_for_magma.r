@@ -10,6 +10,9 @@
 #' @importFrom data.table setcolorder
 #' @importFrom utils read.table
 #' @import stringr
+#' genome builder:GRCh 37
+#' round N columns up if it's not integer
+#' convert  p value to zeros is lower than 3e-40
 #' @export
 format_sumstats_for_magma <- function(path){
   
@@ -104,7 +107,7 @@ format_sumstats_for_magma <- function(path){
   if(sum(c("CHR","BP") %in% col_headers)==2 & sum("SNP" %in% col_headers)==0){
     print("There is no SNP column found within the data. It must be inferred from CHR and BP information.")
     
-    genomebuild <- as.numeric(readline("Which genome build is the data from? 1 for GRCh37, 2 for GRCh38... "))
+    genomebuild <- 1
     if(!genomebuild %in% c(1,2)){stop("Genome build must be entered as either 1 (for GRCh37) or 2 (for GRCh38)")}
     
     SNP_LOC_DATA = load_snp_loc_data()
@@ -164,7 +167,8 @@ format_sumstats_for_magma <- function(path){
 
   sumstats <- fread(path)
     # MAGMA cannot handle P-values as low as 3e-400... so convert them to zeros
-    if (as.logical(as.numeric(readline("MAGMA cannot handle P-values as low as 3e-400. Do you want MAGMA.celltyping to convert any (if) existing ones to zeroes? 0 for NO, 1 for YES")))) {
+  convertp = 1
+    if (as.logical(as.numeric(convertp))) {
       rows_of_data <- c(sumstats_file[1], sumstats_file[2]); col_headers = strsplit(rows_of_data[1], "\t")[[1]]
       sumstats$P = as.numeric(as.character(sumstats$P)) # Note, I've not tested this since changing it from the original code... which was using gawk/sed
     }
@@ -174,9 +178,10 @@ format_sumstats_for_magma <- function(path){
   
   # Sometimes the N column is not all integers... so round it up
   # - I edited this on 3rd April 2020 so it uses data.table... but don't have a dataset to check that it still works
+  roundupn = 1
   if("N" %in% col_headers) {
     #whichN = which(col_headers %in% "N")
-    if (as.logical(as.numeric(readline("Sometimes the N column is not all integers. Do you want MAGMA.celltyping to (if such instances exist) round them up? 0 for NO, 1 for YES")))) {
+    if (as.logical(as.numeric(roundupn))) {
       #rows_of_data <- c(sumstats_file[1], sumstats_file[2]); col_headers = strsplit(rows_of_data[1], "\t")[[1]]
       sumstats <- fread(path) 
       sumstats$N = round(as.numeric(as.character(sumstats$N))) # Note, I've not tested this since changing it from the original code... which was using gawk/sed
