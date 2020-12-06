@@ -7,14 +7,14 @@
 #' @param downstream_kb How many kb downstream of the gene should SNPs be included?
 #' @param N What is the N number for this GWAS? That is cases+controls
 #' @param genome_ref_path Path to the folder containing the 1000 genomes .bed files (which can be downloaded from https://ctg.cncr.nl/software/MAGMA/ref_data/g1000_eur.zip)
-#'
+#' @param genome_build: "GRCh37" or "GRCh38"
 #' @return Filepath for the genes.out file
 #'
 #' @examples
 #' genesOutPath = map.snps.to.genes(path_formatted)
 #'
 #' @export
-map.snps.to.genes <- function(path_formatted,upstream_kb=10,downstream_kb=1.5,N=NULL,genome_ref_path){
+map.snps.to.genes <- function(path_formatted,upstream_kb=10,downstream_kb=1.5,N=NULL,genome_ref_path,genome_build){
     path_formatted = path.expand(path_formatted)
     magmaPaths = get.magma.paths(path_formatted,upstream_kb,downstream_kb)
     
@@ -35,7 +35,7 @@ map.snps.to.genes <- function(path_formatted,upstream_kb=10,downstream_kb=1.5,N=
     }
     
     # Determine which genome build it uses & get path to gene loc file
-    genome_build = get_genomebuild_for_sumstats(path_formatted)
+    
     gene_loc_dir = sprintf("%s/data/",system.file(package="MAGMA.Celltyping"))
     if(genome_build == "GRCh37"){genomeLocFile=sprintf("%s/NCBI37.3.gene.loc",gene_loc_dir)}
     if(genome_build == "GRCh38"){genomeLocFile=sprintf("%s/NCBI38.gene.loc",gene_loc_dir)}
