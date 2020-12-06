@@ -10,11 +10,11 @@
 #' @importFrom data.table setcolorder
 #' @importFrom utils read.table
 #' @import stringr
-#' genome builder:GRCh 37
+#' @genome builder:GRCh 37 = 1, else 2
 #' round N columns up if it's not integer
 #' convert  p value to zeros is lower than 3e-40
 #' @export
-format_sumstats_for_magma <- function(path){
+format_sumstats_for_magma <- function(path,genomebuild){
   
   # Checking if the file exists should happen first
   if (!file.exists(path)) {stop("Path to GWAS sumstats is not valid")}
@@ -107,7 +107,7 @@ format_sumstats_for_magma <- function(path){
   if(sum(c("CHR","BP") %in% col_headers)==2 & sum("SNP" %in% col_headers)==0){
     print("There is no SNP column found within the data. It must be inferred from CHR and BP information.")
     
-    genomebuild <- 1
+    
     if(!genomebuild %in% c(1,2)){stop("Genome build must be entered as either 1 (for GRCh37) or 2 (for GRCh38)")}
     
     SNP_LOC_DATA = load_snp_loc_data()
